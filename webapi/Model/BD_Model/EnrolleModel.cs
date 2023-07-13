@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace webapi.Model.BD_Model
 {
-    [Table("ListEnrollee2", Schema = "dbo")]
+    [Table("ListEnrollee3", Schema = "dbo")]
     [Keyless]
     public class EnrolleModel
     {
@@ -32,7 +32,7 @@ namespace webapi.Model.BD_Model
 
         [Column("Предмет4")]
         public int? Pred_4 { get; set; }
-        [Column("Сумма баллов за инд.дост")]
+        [Column("Сумма баллов за инд.дост.(конкурсные)")]
         public int? SumBal_OnlyID { get; set; }
 
         [Column("Приоритет")]
@@ -51,18 +51,24 @@ namespace webapi.Model.BD_Model
         public string? AdmissionCategory { get; set; }
 
         [Column("Форма обучения")]
-        public string? FormStudy { get; set; }
+        public string? FormStudy { get; set; } 
+        
+        [Column("Уровень подготовки")]
+        public string? LevelOfTraining { get; set; }
 
 
 
-        [Column("НаправлениеИспециальность")]
+        [Column("Направление\\специальность")]
         public string? Napravlenie { get; set; }
 
         [Column("Профиль")]
         public string? Profil { get; set; }
 
         [Column("Оригинал")]
-        public string? OriginalDiplom { get; set; }
+        public string? OriginalDiplom { get; set; } 
+
+        [Column("Состояние")]
+        public string? State { get; set; }
 
 
 
