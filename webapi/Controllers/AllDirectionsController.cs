@@ -1,11 +1,11 @@
-﻿using webapi.Model;
-using webapi.Model.BD_Model;
+﻿using webapi.Model.BD_Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Immutable;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using webapi.DB_Service;
+using webapi.Model;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,32 +24,13 @@ namespace webapi.Controllers
             db = dbService;
         }
 
-        [HttpGet]
-        //public async Task<KashaModel> Programs(string LevelTraining, string FormStudy)
-        //{
-        //    KashaModel Summary = new();
-        //    var AllNaprav = await db.ListEnrolle
-        //        .Where(x => x.LevelTraining == LevelTraining && x.FormStudy == FormStudy)
-        //        .Take(50)
-        //        .ToListAsync();
-        //    //var AllNaprav = await db.ListEnrolle.Where(x => x.LevelTraining == LevelTraining && x.FormStudy == FormStudy).Select(x=>x.Napravlenie).Distinct().ToListAsync();
-        //    Summary.enrolleeModels = AllNaprav;
-        //    Summary.strings = AllNaprav.Select(x => x.Napravlenie).Distinct().ToList();
-
-        //    return Summary;
-        //}
-        public Task<IActionResult> Programs()
+        [HttpPost]
+        public async Task<List<string>> Programs([FromBody] DataLevStudy Data)
         {
-            //KashaModel Summary = new();
-            //var AllNaprav = await db.ListEnrolle
-            //    .Where(x => x.LevelTraining == LevelTraining && x.FormStudy == FormStudy)
-            //    .Take(50)
-            //    .ToListAsync();
-            ////var AllNaprav = await db.ListEnrolle.Where(x => x.LevelTraining == LevelTraining && x.FormStudy == FormStudy).Select(x=>x.Napravlenie).Distinct().ToListAsync();
-            //Summary.enrolleeModels = AllNaprav;
-            //Summary.strings = AllNaprav.Select(x => x.Napravlenie).Distinct().ToList();
+            var ListNaprav = await db.ListEnrolle
+                .Where(x => x.FormStudy == Data.LevelTraining).Select(x => x.Napravlenie).Distinct().ToListAsync();
 
-            return (Task<IActionResult>)Results.Ok();
+            return ListNaprav;
         }
 
     }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webapi.DB_Service;
+using webapi.Model;
 using webapi.Model.BD_Model;
 
 namespace webapi.Controllers
@@ -18,26 +19,11 @@ namespace webapi.Controllers
             db = dbService;
         }
 
-        [HttpGet]
-        public async Task<List<OneEnrolleListModel>> Programs(string Snils)
+        [HttpPost]
+        public async Task<List<EnrolleModel>> Programs([FromBody] EnrolleSnils snils)
         {
-            List<OneEnrolleListModel> Enrolles = await db.ListEnrolle.Where(x => x.Snils == Snils).Select(x => new OneEnrolleListModel
-            {
-                Snils = x.Snils,
-                AdmissionCategory = x.AdmissionCategory,
-                FoundationReceipts = x.FoundationReceipts,
-                HaveDiplomInVus = x.HaveDiplomInVus,
-                IdEnrolle = x.IdEnrolle,
-                LevelTraining = x.LevelTraining,
-                Napravlenie = x.Napravlenie,
-                Naprav_Group = x.Naprav_Group,
-                Prioritet = x.Prioritet,
-                Profil = x.Profil,
-                Soglasie = x.Soglasie,
-                SumBall = x.SumBall,
-                SumBall_ID = x.SumBall_ID,
-                TypeIsp = x.TypeIsp
-            }).ToListAsync();
+
+            List<EnrolleModel> Enrolles = await db.ListEnrolle.Where(x => x.Snils == snils.Snils).OrderBy(x => x.Priority).ToListAsync();
 
             return Enrolles;
         }

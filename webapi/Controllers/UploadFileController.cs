@@ -17,40 +17,6 @@ namespace webapi.Controllers
             _logger = logger;
             db = dbService;
         }
-        public async Task<string> GetExcelAsync(string NameFile)
-        {
-
-            string NameFiles = "wwwroot/" + NameFile;
-            string webRootPath = Directory.GetCurrentDirectory();
-            string filePath = Path.Combine(webRootPath, NameFiles); // Замените "файл.xlsx" на имя вашего файла
-
-            FileInfo fileInfo = new FileInfo(filePath);
-            try
-            {
-
-                ExcelPackage package = new ExcelPackage(fileInfo);
-
-                ExcelWorksheet worksheet = package.Workbook.Worksheets["Данные"]; // Индекс первого листа
-
-                int rowCount = worksheet.Dimension.Rows;
-
-                for (int row = 1; row <= rowCount; row++)
-                {  
-                    string cellValue = worksheet.Cells[row, 1].Value?.ToString();
-                    // Обработка значения ячейки
-
-                    // Задержка для примера (может быть не нужна в реальном коде)
-                }
-
-                return "Загружено";
-            }
-            catch (Exception ex)
-            {
-                await Console.Out.WriteLineAsync(ex.ToString());
-                return "Ошибка";
-            }
-
-        }
         [HttpPost]
         public IActionResult UploadFile(IFormFile file)
         {

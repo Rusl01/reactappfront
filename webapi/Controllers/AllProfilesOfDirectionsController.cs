@@ -27,7 +27,7 @@ namespace webapi.Controllers
         [HttpGet]
         public async Task<List<string>> Programs(string LevelTraining, string FormStudy, string Napravlenie)
         {
-            var Profils = await db.ListEnrolle.Where(x => x.LevelTraining == LevelTraining && x.FormStudy == FormStudy && x.Napravlenie == Napravlenie).Select(x => x.Profil).Distinct().ToListAsync();
+            var Profils = await db.ListEnrolle.Where(x => x.FormStudy == FormStudy && x.Napravlenie == Napravlenie).Select(x => x.Profil).Distinct().ToListAsync();
 
             return Profils;
         }

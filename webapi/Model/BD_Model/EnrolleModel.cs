@@ -1,66 +1,71 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.CompilerServices;
 
 namespace webapi.Model.BD_Model
 {
-    [Table("ListEnrollee", Schema = "dbo")]
+    [Table("ListEnrollee2", Schema = "dbo")]
     [Keyless]
-    public class EnrolleeModel
+    public class EnrolleModel
     {
-        [Column("СуммаБаллов")]
-        public int? SumBall { get; set; }
+        [NotMapped]
+        public int? key { get; set; }
 
-        [Column("ФизическоеЛицо")]
-        public string? FIO { get; set; }
+        [Column("Уникальный код")]
+        public string? Snils { get; set; }
 
-        [Column("ФормаОбучения")]
-        public string? FormStudy { get; set; }
+        [Column("Тип вступительных испытаний (по заявлениям)")]
+        public string? TypeIsp { get; set; }
 
-        [Column("Направление")]
-        public string Napravlenie { get; set; }
+        [Column("Сумма баллов")]
+        public int? SumBal_ID { get; set; }
 
-        [Column("УровеньПодготовки")]
-        public string? LevelTraining { get; set; }
+        [Column("Сумма баллов по предметам")]
+        public int? SumBal { get; set; }
 
-        [Column("ОснованиеПоступления")]
-        public string? FoundationReceipts { get; set; }
+        [Column("Предмет1")]
+        public int? Pred_1 { get; set; }
+        [Column("Предмет2")]
+        public int? Pred_2 { get; set; }
 
-        [Column("КатегорияПриема")]
+        [Column("Предмет3")]
+        public int? Pred_3 { get; set; }
+
+        [Column("Предмет4")]
+        public int? Pred_4 { get; set; }
+        [Column("Сумма баллов за инд.дост")]
+        public int? SumBal_OnlyID { get; set; }
+
+        [Column("Приоритет")]
+        public int? Priority { get; set; }
+
+        [Column("Нуждаемость в общежитии")]
+        public string? NeedRoom { get; set; }
+
+        [Column("Особенности приема")]
+        public string? ReceptionFeatures { get; set; }
+
+        [Column("Основание поступления")]
+        public string? ReasonForAdmission { get; set; }
+
+        [Column("Категория приема")]
         public string? AdmissionCategory { get; set; }
 
-        [Column("КонкурснаяГруппа")]
-        public string? Naprav_Group { get; set; }
+        [Column("Форма обучения")]
+        public string? FormStudy { get; set; }
 
+
+
+        [Column("НаправлениеИспециальность")]
+        public string? Napravlenie { get; set; }
 
         [Column("Профиль")]
         public string? Profil { get; set; }
 
-        [Column("Приоритет")]
-        public int? Prioritet { get; set; }
-
-        [Column("ТипИспытаний")]
-        public string? TypeIsp { get; set; }
-
-        [Column("ЕстьОригиналВВузе")]
-        public string? HaveDiplomInVus { get; set; }
+        [Column("Оригинал")]
+        public string? OriginalDiplom { get; set; }
 
 
-        [Column("НомерЛД")]
-        public int? IdEnrolle { get; set; }
 
-        [Column("СНИЛС")]
-        public string? Snils { get; set; }
 
-        [Column("Факультет")]
-        public string? Institut { get; set; }
-
-        [Column("Сумма с ИД")]
-        public int? SumBall_ID { get; set; }
-
-        [Column("Согласие")]
-        public string? Soglasie { get; set; }
     }
-
-
 }

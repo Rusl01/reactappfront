@@ -15,115 +15,88 @@ import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import {
   fetchAllDirections,
-  fetchAllProfiles,
   fetchAllData,
+  fetchEnrolle,
 } from "./http/statementApi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
-
-const data = [
-  {
-    sumBall: 243,
-    napravlenie: "Информатика и вычислительная техника",
-    levelTraining: "Бакалавриат",
-    foundationReceipts: "Бюджетная основа",
-    admissionCategory: "Имеющие особое право",
-    naprav_Group: "09.03.01_О_Б_ОП_Информатика и вычислительная техника",
-    profil: "Информационные системы управления бизнес-процессами",
-    prioritet: 1,
-    typeIsp: "Собственные",
-    haveDiplomInVus: "Да",
-    idEnrolle: 145290,
-    snils: "169-969-534 63",
-    sumBall_ID: 253,
-    soglasie: "Нет",
-  },
-];
 
 const App = () => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+  const navigate = useNavigate();
 
   const [directions, setDirections] = useState([]);
-  const [profiles, setProfiles] = useState([]);
   const [tablesData, setTablesData] = useState([]);
 
-  const [formStudy, setFormStudy] = useState("Бакалавриат");
-  const [levelTraining, setLevelTraining] = useState("Очная");
+  const [formStudy, setFormStudy] = useState("Очная");
+  const [levelTraining, setLevelTraining] = useState("Бакалавриат");
   const [direction, setDirection] = useState(null);
-  const [profile, setProfile] = useState(null);
+  const [reasonAdmission, setReasonAdmission] = useState(null);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
   const [loading, setLoading] = useState(false);
-  //const [messageApi, contextHolder] = message.useMessage();
+  const [isLoadingSearch, setIsLoadingSearch] = useState(false);
 
   useEffect(() => {
     fetchAllDirections(levelTraining, formStudy)
       .then((data) => {
+        setDirection(null);
         setDirections(data);
       })
-      .catch((err) =>
-        message.error(
-          "Извините, что-то пошло не так, мы уже занимаемся этим вопросом"
-        )
-      );
-  }, []);
+      .catch((err) => {});
+  }, [levelTraining, formStudy]);
 
   useEffect(() => {
-    //setLoading(true);
-    fetchAllData(levelTraining, formStudy, direction, profile)
+    setLoading(true);
+    fetchAllData(levelTraining, formStudy, direction, reasonAdmission)
       .then((data) => {
         setTablesData(data);
         setLoading(false);
       })
-      .catch((err) =>
-        message.error(
-          "Извините, что-то пошло не так, мы уже занимаемся этим вопросом"
-        )
-      );
-  }, [formStudy, levelTraining, direction, profile]);
+      .catch((err) => {
+        setLoading(false);
+      });
+  }, [formStudy, levelTraining, direction, reasonAdmission]);
 
-  const getProfiles = (value) => {
-    //  setDirection(value);
-    //  fetchAllProfiles(levelTraining, formStudy, direction)
-    //    .then((data) => {
-    //      setProfiles(data);
-    //    })
-    // 	.catch((err) =>
-    // 	message.error(
-    // 	  "Извините, что-то пошло не так, мы уже занимаемся этим вопросом"
-    // 	)
-    //  );
-  };
-
-  //   const getEnrolleStatements = (snils) => {
-  // 	fetchAllDataForEnrolle(snils)
-  // 	.then((data) => {
-
-  // 	 })
-  // 	 .catch((err) =>
-  // 	 message.error(
-  // 		"Извините, что-то пошло не так, мы уже занимаемся этим вопросом"
-  // 	 ))
-  //   }
-  let listProfiles = [];
   let listDirections = [];
 
   const createListDirections = (directions) => {
-    listDirections = directions.map((dir) => ({ value: dir, label: dir }));
+    listDirections = directions?.map((dir) => ({
+      key: dir,
+      value: dir,
+      label: dir,
+    }));
   };
   createListDirections(directions);
 
-  const createListProfiles = (profiles) => {
-    listProfiles = profiles.map((profiles) => ({
-      value: profiles,
-      label: profiles,
-    }));
+  const searchEnrolle = (value) => {
+    setIsLoadingSearch(true);
+    fetchEnrolle(value)
+      .then((data) => {
+        if (data === true) {
+          setIsLoadingSearch(false);
+          navigate(
+            `/abiturient/${
+              value.lenght !== 0
+                ? value.includes(" ")
+                  ? value.replaceAll(" ", "_")
+                  : value
+                : value
+            }`
+          );
+        } else {
+          setIsLoadingSearch(false);
+          message.error(`Пользователь со СНИЛСом ${value} не найден`);
+        }
+      })
+      .catch((err) => {
+        setIsLoadingSearch(false);
+      });
   };
-  createListProfiles(profiles);
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -239,18 +212,10 @@ const App = () => {
 
   const columns = [
     {
-      title: "Наименование направления",
-      dataIndex: "napravlenie",
-      key: "napravlenie",
-      width: "auto",
-      ...getColumnSearchProps("napravlenie"),
-    },
-    {
-      title: "Наименование профиля",
-      dataIndex: "profil",
-      key: "profil",
-      width: "auto",
-      ...getColumnSearchProps("profil"),
+      title: "№",
+      dataIndex: "key",
+      rowScope: "row",
+      width: "5%",
     },
     {
       title: "СНИЛС",
@@ -258,40 +223,81 @@ const App = () => {
       key: "snils",
       width: "10%",
       ...getColumnSearchProps("snils"),
-      render: (text) => (
-        <Link
-          to={`/abiturient/${
-            text.includes(" ") ? text.replaceAll(" ", "_") : text
-          }`}
-        >
-          {text}
-        </Link>
-      ),
+      render: (text) => {
+        if (text !== null && text !== undefined) {
+          if (text.length !== 0) {
+            return (
+              <Link
+                to={`/abiturient/${
+                  text.includes(" ") ? text.replaceAll(" ", "_") : text
+                }`}
+              >
+                {text}
+              </Link>
+            );
+          }
+        }
+      },
     },
-
     {
       title: "Приоритет",
-      dataIndex: "prioritet",
-      key: "prioritet",
+      dataIndex: "priority",
+      key: "priority",
       width: "5%",
     },
     {
-      title: "Сумма баллов",
-      dataIndex: "sumBall_ID",
-      key: "sumBall_ID",
+      title: "Сумма баллов с ИД",
+      dataIndex: "sumBal_ID",
+      key: "sumBal_ID",
+      width: "4%",
+    },
+    {
+      title: "Сумма баллов по предметам",
+      dataIndex: "sumBal",
+      key: "sumBal",
       width: "5%",
     },
     {
-      title: "Тип испытаний",
+      title: "Русский язык",
+      dataIndex: "pred_1",
+      key: "pred_1",
+      width: "4%",
+    },
+    {
+      title:
+        "Информатика/Физика/Общая энергетика/Прикладная информатика/Эконом теория/Химия/Биология",
+      dataIndex: "pred_2",
+      key: "pred_2",
+      width: "4%",
+      ellipsis: {
+        showTitle: false,
+      },
+    },
+    {
+      title: "Математика/ ПМ",
+      dataIndex: "pred_3",
+      key: "pred_3",
+      width: "4%",
+      // ellipsis: {
+      // 	showTitle: false,
+      //  },
+    },
+    {
+      title: "Индивидуальные достижения",
+      dataIndex: "sumBal_OnlyID",
+      key: "sumBal_OnlyID",
+      width: "5%",
+    },
+    {
+      title: "Тип вступительных испытьаний",
       dataIndex: "typeIsp",
       key: "typeIsp",
-      width: "auto",
+      width: "8%",
     },
-
     {
       title: "Оригинал",
-      dataIndex: "haveDiplomInVus",
-      key: "haveDiplomInVus",
+      dataIndex: "originalDiplom",
+      key: "originalDiplom",
       width: "5%",
       render: (text) => {
         if (text === "Да") {
@@ -306,15 +312,88 @@ const App = () => {
       },
     },
     {
-      title: "Категория приема",
-      dataIndex: "admissionCategory",
-      key: "admissionCategory",
-      width: "10%",
+      title: "Нуждаемость в общежитии",
+      dataIndex: "needRoom",
+      key: "needRoom",
+      width: "8%",
+    },
+  ];
+
+  const columnsMag = [
+    {
+      title: "№",
+      dataIndex: "key",
+      rowScope: "row",
+      width: "5%",
     },
     {
-      title: "Согласие на зачисление",
-      dataIndex: "soglasie",
-      key: "soglasie",
+      title: "СНИЛС",
+      dataIndex: "snils",
+      key: "snils",
+      width: "10%",
+      ...getColumnSearchProps("snils"),
+      render: (text) => {
+        if (text !== null && text !== undefined) {
+          if (text.length !== 0) {
+            return (
+              <Link
+                to={`/abiturient/${
+                  text.includes(" ") ? text.replaceAll(" ", "_") : text
+                }`}
+              >
+                {text}
+              </Link>
+            );
+          }
+        }
+      },
+    },
+    {
+      title: "Приоритет",
+      dataIndex: "priority",
+      key: "priority",
+      width: "5%",
+    },
+    {
+      title: "Сумма баллов с ИД",
+      dataIndex: "sumBal_ID",
+      key: "sumBal_ID",
+      width: "8%",
+    },
+    {
+      title: "Междисциплинарный экзамен",
+      dataIndex: "pred_1",
+      key: "pred_1",
+      width: "5%",
+    },
+
+    {
+      title: "Индивидуальные достижения",
+      dataIndex: "sumBal_OnlyID",
+      key: "sumBal_OnlyID",
+      width: "5%",
+    },
+    {
+      title: "Оригинал",
+      dataIndex: "originalDiplom",
+      key: "originalDiplom",
+      width: "5%",
+      render: (text) => {
+        if (text === "Да") {
+          return (
+            <Tag color="#4CBB17" key={text}>
+              {text}
+            </Tag>
+          );
+        } else {
+          return text;
+        }
+      },
+    },
+    {
+      title: "Нуждаемость в общежитии",
+      dataIndex: "needRoom",
+      key: "needRoom",
       width: "8%",
     },
   ];
@@ -353,9 +432,14 @@ const App = () => {
           justifyContent: "space-between",
         }}
       >
-        <div className="demo-logo" style={{ color: "white" }}>
-          КГЭУ
-        </div>
+        <a href="https://kgeu.ru/" target="_blank" rel="noopener">
+          <div
+            className="demo-logo"
+            style={{ color: "white", fontWeight: "bold", fontSize: 24 }}
+          >
+            КГЭУ
+          </div>
+        </a>
 
         <Search
           placeholder="СНИЛС"
@@ -363,7 +447,10 @@ const App = () => {
           enterButton="Найти"
           size="middle"
           style={{ width: "auto" }}
-          onSearch={() => {}}
+          onSearch={(value) => {
+            searchEnrolle(value);
+          }}
+          loading={isLoadingSearch}
         />
       </Header>
       <Content
@@ -390,14 +477,12 @@ const App = () => {
               buttonStyle="solid"
               size="middle"
               style={{ margin: 10, width: "auto" }}
-              onChange={(value) => setFormStudy(value)}
+              onChange={(e) => setLevelTraining(e.target.value)}
             >
               <Radio.Button value="Бакалавриат">
                 Бакалавриат/специалитет
               </Radio.Button>
               <Radio.Button value="Магистратура">Магистратура</Radio.Button>
-              <Radio.Button value="СПО">СПО</Radio.Button>
-              <Radio.Button value="Аспирантура">Аспирантура</Radio.Button>
             </Radio.Group>
           </div>
           <div style={{ marginLeft: 10, fontWeight: "600" }}>
@@ -407,7 +492,7 @@ const App = () => {
               buttonStyle="solid"
               size="middle"
               style={{ margin: 10 }}
-              onChange={(value) => setLevelTraining(value)}
+              onChange={(e) => setFormStudy(e.target.value)}
             >
               <Radio.Button value="Очная">Очная</Radio.Button>
               <Radio.Button value="Очно-заочная">Очно-заочная</Radio.Button>
@@ -420,7 +505,7 @@ const App = () => {
               showSearch
               style={{
                 margin: 10,
-                width: "auto",
+                width: "600",
               }}
               placeholder="Введите название направления"
               optionFilterProp="children"
@@ -433,18 +518,18 @@ const App = () => {
                   .localeCompare((optionB?.label ?? "").toLowerCase())
               }
               options={listDirections}
-              onChange={(value) => getProfiles(value)}
+              onChange={(value) => setDirection(value)}
             />
           </div>
           <div style={{ marginLeft: 10, fontWeight: "600" }}>
-            Профиль:
+            Основание поступления:
             <Select
               showSearch
               style={{
                 margin: 10,
-                width: "auto",
+                width: "600",
               }}
-              placeholder="Введите название профиля"
+              placeholder="Выберите основание поступления"
               optionFilterProp="children"
               filterOption={(input, option) =>
                 (option?.label ?? "").includes(input)
@@ -454,16 +539,27 @@ const App = () => {
                   .toLowerCase()
                   .localeCompare((optionB?.label ?? "").toLowerCase())
               }
-              options={listProfiles}
-              onChange={(value) => setProfile(value)}
+              options={[
+                { value: "На общих основаниях", label: "На общих основаниях" },
+                { value: "Целевая квота", label: "Целевая квота" },
+                { value: "Отдельная квота", label: "Отдельная квота" },
+                { value: "Ососбая квота", label: "Ососбая квота" },
+                {
+                  value: "Полное возмещение затрат",
+                  label: "Полное возмещение затрат",
+                },
+              ]}
+              onChange={(value) => setReasonAdmission(value)}
             />
           </div>
           {/* <Outlet /> */}
           <>
             <Table
-              columns={columns}
-              dataSource={data}
+              columns={levelTraining === "Бакалавриат" ? columns : columnsMag}
+              dataSource={tablesData}
+              rowKey={(record) => record.key}
               bordered
+              //pagination={false}
               loading={loading}
               size="small"
               scroll={{

@@ -10,7 +10,7 @@ namespace webapi.DB_Service
             //Database.EnsureCreated();
         }
 
-        public DbSet<EnrolleeModel> ListEnrolle { get; set; }
+        public DbSet<EnrolleModel> ListEnrolle { get; set; }
         //public DbSet<OneEnrolleListModel> OneEnrolle {  get; set; }
     }
 }
