@@ -17,10 +17,10 @@ namespace webapi.Model.BD_Model
         public string? TypeIsp { get; set; }
 
         [Column("Сумма баллов")]
-        public int? SumBal_ID { get; set; }
+        public double? SumBal_ID { get; set; }
 
         [Column("Сумма баллов по предметам")]
-        public int? SumBal { get; set; }
+        public double? SumBal { get; set; }
 
         [Column("Предмет1")]
         public int? Pred_1 { get; set; }
@@ -30,10 +30,8 @@ namespace webapi.Model.BD_Model
         [Column("Предмет3")]
         public int? Pred_3 { get; set; }
 
-        [Column("Предмет4")]
-        public int? Pred_4 { get; set; }
         [Column("Сумма баллов за инд.дост.(конкурсные)")]
-        public int? SumBal_OnlyID { get; set; }
+        public double? SumBal_OnlyID { get; set; }
 
         [Column("Приоритет")]
         public int? Priority { get; set; }
